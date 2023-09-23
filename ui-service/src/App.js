@@ -55,6 +55,24 @@ function App() {
     },3000)
   },[isCreating]);
 
+  useEffect(()=>{
+    const sse = new EventSource('/api/sse');
+    sse.onopen =()=>{};
+    function getJobUpdates(data) {
+      // process the data here,
+      // then pass it to state to be rendered
+    }
+    sse.onmessage = e => getJobUpdates(JSON.parse(e.data));
+    sse.onerror = () => {
+      // error log here 
+      
+      sse.close();
+    }
+    return () => {
+      sse.close();
+    };
+  },[]);
+
   return (
     <>
       <Container>
