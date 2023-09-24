@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.module.css';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import InputForm from "./components/InputForm";
 import JobList from './components/jobs/JobList';
 import { Container } from 'react-bootstrap';
@@ -50,22 +51,28 @@ function App() {
     }
     //make a call to fetch the jobs
     setJobsState((prevState)=>({...prevState,isFetching:true,jobs:JOB_DATA}));
-    setTimeout(()=>{
-      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:JOB_DATA}));
-    },3000)
+    axios.get('http://localhost:3000/jobs').then((data)=>{
+      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data}));
+    }).catch((err)=>{
+      //handler error
+    });
   },[isCreating]);
 
   useEffect(()=>{
-    const sse = new EventSource('/api/sse');
-    sse.onopen =()=>{};
-    function getJobUpdates(data) {
-      // process the data here,
-      // then pass it to state to be rendered
-    }
-    sse.onmessage = e => getJobUpdates(JSON.parse(e.data));
-    sse.onerror = () => {
-      // error log here 
-      
+    const sse = new EventSource('http://localhost:3000/jobs/sse');
+    sse.onopen =(e)=>{
+
+    };
+    sse.onmessage = (e) => {
+      const jobData = JSON.parse(e.data);
+      setJobsState((prevState)=>({...prevState,jobs:prevState.jobs.map((job)=>{
+        if(job.jobId === jobData.jobId) {
+          return jobData;
+        }
+        return job;
+      })}));
+    };
+    sse.onerror = (e) => {
       sse.close();
     }
     return () => {

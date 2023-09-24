@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
-import { jobProviders } from './providers/job.providers';
-import { ConfigModule } from '@nestjs/config';
-import { JobServiceService } from './job.service/job.service.service';
-import { JobsService } from './job.service';
+import { JobService } from './job.service';
+import { JobController } from './job.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Job } from './entities/job.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Module({
-  providers: [jobProviders, JobServiceService, JobsService],
-  imports:[ConfigModule]
+  imports: [TypeOrmModule.forFeature([Job]),EventEmitter2],
+  exports: [TypeOrmModule],
+  controllers: [JobController],
+  providers: [JobService],
 })
-export class JobsModule {}
+export class JobModule {}

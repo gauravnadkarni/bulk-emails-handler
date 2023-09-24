@@ -1,11 +1,12 @@
+import { table } from 'console';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity("jobs")
 export class Job {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("increment")
+  id?: number;
 
-  @Column({type:'character varying', length: 500 })
+  @Column({type:'varchar', length: 500 })
   jobId: string;
 
   @Column('bigint')
@@ -14,7 +15,7 @@ export class Job {
   @Column('bigint')
   numOfEmailsSentSoFar: bigint;
 
-  @Column({type:'character varying', length: 10 })
+  @Column({type:'varchar', length: 10 })
   status: string;
 
   @Column({type:'boolean', default:false})

@@ -1,18 +1,26 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JobController } from './job/job.controller';
-import { JobsModule } from './job/job.module';
 import { DatabaseModule } from './database/database.module';
-import appConfig from './config/database.config';
-import { ConfigModule } from '@nestjs/config';
+import databaseConfig from './config/database.config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import {JobModule} from './job/job.module';
+import {dataSourceOptions} from './config/typeorm.config';
+import { JobService } from './job/job.service';
+import { DataSource } from 'typeorm';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-  imports: [JobsModule, DatabaseModule,ConfigModule.forRoot({
-    envFilePath: `.env.${process.env.NODE_ENV}`,
-    load:[appConfig],
-  })],
+  imports: [
+    TypeOrmModule.forRoot(dataSourceOptions),
+    EventEmitterModule.forRoot(),
+    JobModule
+  ],
   controllers: [AppController, JobController],
-  providers: [AppService],
+  providers: [AppService, JobService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
