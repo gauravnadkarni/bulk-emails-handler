@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.module.css';
 import { useEffect, useState } from 'react';
+import { io } from "socket.io-client";
 import axios from 'axios';
 import InputForm from "./components/InputForm";
 import JobList from './components/jobs/JobList';
@@ -59,7 +60,35 @@ function App() {
   },[isCreating]);
 
   useEffect(()=>{
-    
+    const socket = io("http://localhost");
+    socket.on("job.update", (jobData) => { 
+      setJobsState((prevState)=>{
+        const {jobs} = prevState;
+        if(!jobs || jobs.length===0) {
+          return{
+            ...prevState,
+            jobs:[jobData],
+          }
+        }
+        const job = jobs.find((job)=>(job.jobId===jobData.jobid));
+        if(!job) {
+          return {
+            ...prevState,
+            jobs:[...prevState.jobs,job],
+          }
+        }
+        const jobsArray = jobs.map((job)=>{
+          if(job.jobId===jobData.jobId) {
+            return jobData;
+          }
+          return job;
+        });
+        return {...prevState,jobs:jobsArray};
+      });
+    });
+    return ()=>{
+      socket.disconnect();
+    }
   },[]);
 
   return (

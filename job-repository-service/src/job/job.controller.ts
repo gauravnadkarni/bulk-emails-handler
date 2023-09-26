@@ -5,26 +5,16 @@ import { UpdateJobDto } from './dto/update-job.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Observable, fromEvent, interval, map } from 'rxjs';
 import { Job as JobDto } from './dto/job.dto';
-import NewJobEvent from './events/new-job.event';
 
 @Controller('jobs')
 export class JobController {
   constructor(private readonly jobService: JobService, private readonly eventEmitter: EventEmitter2) {}
 
-    @Sse("sse")
-    listenToUpdates():Observable<MessageEvent> {
-        return fromEvent(this.eventEmitter, "email.sent")
-          .pipe(map(job => {
-              return { data: job } as MessageEvent;
-          }));
-    }
-
     @Post()
     async createJob(@Body() jobDto: JobDto):Promise<JobDto> {
       const dto:JobDto = await this.jobService.addNewJob(jobDto);
-      this.eventEmitter.emit("email.sent", 
-          new NewJobEvent(dto)
-        ) 
+      console.log("event raised");
+      this.eventEmitter.emit("email.sent", dto); 
       return dto;
     }
 
