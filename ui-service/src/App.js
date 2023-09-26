@@ -51,7 +51,7 @@ function App() {
     }
     //make a call to fetch the jobs
     setJobsState((prevState)=>({...prevState,isFetching:true,jobs:JOB_DATA}));
-    axios.get('http://localhost:3000/jobs').then((data)=>{
+    axios.get('/jobs-repo/jobs').then((data)=>{
       setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data}));
     }).catch((err)=>{
       //handler error
@@ -59,25 +59,7 @@ function App() {
   },[isCreating]);
 
   useEffect(()=>{
-    const sse = new EventSource('http://localhost:3000/jobs/sse');
-    sse.onopen =(e)=>{
-
-    };
-    sse.onmessage = (e) => {
-      const jobData = JSON.parse(e.data);
-      setJobsState((prevState)=>({...prevState,jobs:prevState.jobs.map((job)=>{
-        if(job.jobId === jobData.jobId) {
-          return jobData;
-        }
-        return job;
-      })}));
-    };
-    sse.onerror = (e) => {
-      sse.close();
-    }
-    return () => {
-      sse.close();
-    };
+    
   },[]);
 
   return (

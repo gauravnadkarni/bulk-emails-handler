@@ -1,0 +1,4 @@
+include:
+  - docker-compose-backend-services.yml
+  - docker-compose-api-services.yml
+  - docker-compose-frontend-services.yml
