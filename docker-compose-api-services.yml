@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  job-repository-service:
+    image: node:18.16.0 
+    container_name: job-repository
+    hostname: job-repository-service
+    working_dir: /app
+    ports:
+      - "3001:3000" 
+    volumes:
+      - ./.:/app
+    command: sh -c "npm install && npm run migration:run && npm run start:dev"

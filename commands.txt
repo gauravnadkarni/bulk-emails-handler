@@ -1,1 +1,3 @@
 sudo service mysql start
+
+rabbitmq-plugins enable rabbitmq_management

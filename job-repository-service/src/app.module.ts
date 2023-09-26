@@ -14,6 +14,7 @@ import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({isGlobal: true,}),
     TypeOrmModule.forRoot(dataSourceOptions),
     EventEmitterModule.forRoot(),
     JobModule
