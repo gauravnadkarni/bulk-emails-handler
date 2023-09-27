@@ -12,7 +12,9 @@ export default function Job(props) {
     if(status) {
         statusComponent = <Badge pill bg="warning">No Status</Badge>
         const statusInLowerCase = status.toLowerCase();
-        if(statusInLowerCase==="running") {
+        if(statusInLowerCase==="initiating") {
+            statusComponent = <Badge pill bg="primary">{statusInLowerCase.toUpperCase()}</Badge>
+        } else if(statusInLowerCase==="running") {
             statusComponent = <Badge pill bg="info">{statusInLowerCase.toUpperCase()}</Badge>
         } else if(statusInLowerCase==="success") {
             statusComponent = <Badge pill bg="success">{statusInLowerCase.toUpperCase()}</Badge>

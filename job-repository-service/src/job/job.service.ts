@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { Job as JobDto } from './dto/job.dto';
 import { Job as JobEntity } from './entities/job.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,11 @@ export class JobService {
   ) {}
 
   async findAllJobs(): Promise<Array<JobDto>> {
-    const jobEntities:Array<JobEntity> = await this.jobRepository.find();
+    const jobEntities:Array<JobEntity> = await this.jobRepository.find({
+      order: {
+          id: "DESC"
+      }
+    }); 
     if(!jobEntities || jobEntities.length===0) {
       return jobEntities;
     }
@@ -38,15 +42,21 @@ export class JobService {
     return JobDto.fromEntity(jobEntity);
   }
 
+  async updateJobStatusById(jobDto:JobDto): Promise<JobDto> {
+    let jobEntity:JobEntity = await this.jobRepository.findOneBy({jobId:jobDto.jobId})
+    const updatedJob:UpdateResult = await this.jobRepository.update(jobEntity.id!, {status:jobDto.status, isDone:jobDto.isDone});
+    return await this.jobRepository.findOneBy({jobId:jobDto.jobId})
+  }
+
   async updateEmailSentCount(jobDto:JobDto): Promise<void> {
     await this.jobRepository.manager.transaction(async (transactionalEntityManager) => {
         const jobEntity:JobEntity = await this.jobRepository.findOneBy({jobId:jobDto.jobId});
         if(!jobEntity) {
           return;
         }
-        await transactionalEntityManager.createQueryBuilder().update(jobEntity).set({
+        await this.jobRepository.createQueryBuilder().update(jobEntity).set({
             numOfEmailsSentSoFar: () =>("numOfEmailsSentSoFar + 1"),
-        }).where("jobId = :id", { jobId: jobEntity.jobId }).execute()
+        }).where("id=:id",{id: jobEntity.id}).execute();
     });
   }
 }

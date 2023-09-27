@@ -12,6 +12,7 @@ import { JobService } from './job/job.service';
 import { DataSource } from 'typeorm';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { GatewayModule } from './gateway/gateway.module';
+import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GatewayModule } from './gateway/gateway.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     EventEmitterModule.forRoot(),
     JobModule,
+    MessagingModule,
     GatewayModule,
   ],
   controllers: [AppController, JobController],

@@ -13,7 +13,7 @@ export class JobController {
     @Post()
     async createJob(@Body() jobDto: JobDto):Promise<JobDto> {
       const dto:JobDto = await this.jobService.addNewJob(jobDto);
-      this.eventEmitter.emit("job.created", dto); 
+      this.eventEmitter.emit("job.created", dto);
       return dto;
     }
 

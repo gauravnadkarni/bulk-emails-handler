@@ -7,7 +7,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Job]),EventEmitter2],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule,JobService],
   controllers: [JobController],
   providers: [JobService],
 })

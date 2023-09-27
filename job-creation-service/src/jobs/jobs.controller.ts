@@ -3,7 +3,7 @@ import { Request } from 'express';
 import Job from './dto/job.dto';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
-import { MessagingService } from 'src/messaging/messaging.service';
+import { MessagingService } from '../messaging/messaging.service';
 
 @Controller('jobs')
 export class JobsController {
@@ -14,7 +14,6 @@ export class JobsController {
     async createJob(@Body() jobDto: CreateJobDto): Promise<Job> {
         try{
             const job:Job = this.jobsService.createJob(jobDto);
-            console.log(job)
             await this.messagingService.pushMessage(job);
             return job
         } catch(err) {
