@@ -7,6 +7,7 @@ export default function JobList(props) {
         jobs,
         isFetching,
     } = props;
+
     return <Row>
         <Col xl={12} lg={12} md={12} sm={12} xs={12}>
             <div>
@@ -25,14 +26,14 @@ export default function JobList(props) {
                                 <span className="visually-hidden">Loading...</span>
                             </Spinner></div></td>
                         </tr>)}
-                        {jobs && jobs.map(({id, numOfEmailsToBeSent, numOfEmailsSentSoFar, status})=>(
+                        {(jobs.length>0) && jobs.map(({jobId, numOfEmailsToBeSent, numOfEmailsSentSoFar, status})=>(
                             <Job 
-                                id={id}
+                                id={jobId}
                                 numOfEmailsToBeSent={numOfEmailsToBeSent}
                                 numOfEmailsSentSoFar={numOfEmailsSentSoFar}
                                 status={status}
                             />))}
-                        {!jobs && (<tr>
+                        {(jobs.length===0) && (<tr>
                             <td colSpan={4}>No jobs found</td>
                         </tr>)}
                     </tbody>

@@ -11,12 +11,13 @@ services:
   queue:
     image: "rabbitmq:3.11"
     container_name: queue
+    hostname: backend-queue
     ports:
       - "5672:5672" # RabbitMQ default port for AMQP
       - "15672:15672" # RabbitMQ Management UI
     environment:
-      - RABBITMQ_DEFAULT_USER=admin  # Replace with your desired username
-      - RABBITMQ_DEFAULT_PASS=Pass123  # Replace with your desired password
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=Pass123
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
       - ./definitions.json:/etc/rabbitmq/definitions.json:ro

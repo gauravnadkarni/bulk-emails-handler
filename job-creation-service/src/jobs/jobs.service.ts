@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid'
-import Job from './interfaces/job.intrface';
 import { CreateJobDto } from './dto/create-job.dto';
+import Job from './dto/job.dto';
 
 @Injectable()
 export class JobsService {
@@ -9,9 +9,10 @@ export class JobsService {
         const uuid = uuidv4();
         return {
             jobId: uuid,
-            numOfEmailsToBeSent: createJobDto.numberOfEmailsToBeSent,
-            numOfEmailsSentSoFar:0,
+            numOfEmailsToBeSent: createJobDto.numOfEmailsToBeSent,
+            numOfEmailsSentSoFar: 0,
             status: 'initiating',
+            isDone:false,
         }
     }
 }

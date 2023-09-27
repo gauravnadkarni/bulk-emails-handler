@@ -14,3 +14,16 @@ services:
     depends_on:
       - jobrepodb
       - queue
+
+  job-creation-service:
+    image: node:18.16.0 
+    container_name: job-creator
+    hostname: job-creation-service
+    working_dir: /app
+    ports:
+      - "3005:3000" 
+    volumes:
+      - ./job-creation-service:/app
+    command: sh -c "npm install && npm run start:dev"
+    depends_on:
+      - queue

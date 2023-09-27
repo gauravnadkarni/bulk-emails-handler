@@ -1,3 +1,3 @@
 export class CreateJobDto {
-    readonly numberOfEmailsToBeSent: number;
+    readonly numOfEmailsToBeSent: number;
   }

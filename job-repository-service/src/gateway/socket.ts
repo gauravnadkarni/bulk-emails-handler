@@ -11,8 +11,8 @@ export default class Socket implements OnModuleInit{
     constructor(private readonly eventEmitter: EventEmitter2) {}
 
     onModuleInit() {
-        this.eventEmitter.on('email.sent',(event) =>{
-            this.server.emit('job.update',event);
+        this.eventEmitter.on('job.created',(event) =>{
+            this.server.emit('job.created',event);
         })
     }
 }

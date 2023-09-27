@@ -7,35 +7,37 @@ import InputForm from "./components/InputForm";
 import JobList from './components/jobs/JobList';
 import { Container } from 'react-bootstrap';
 import { isPositiveInt } from './utilities/generic';
+import ToastComponent from './components/shared/toast';
 
 const  JOB_DATA =[{
-  id:1,
+  jobId:1,
   numOfEmailsToBeSent:25,
   numOfEmailsSentSoFar:20,
   status:"success"
 },{
-  id:1,
+  jobId:2,
   numOfEmailsToBeSent:25,
   numOfEmailsSentSoFar:20,
   status:"running"
 },{
-  id:1,
+  jobId:3,
   numOfEmailsToBeSent:25,
   numOfEmailsSentSoFar:20,
   status:"failed"
 },{
-  id:1,
+  jobId:4,
   numOfEmailsToBeSent:25,
   numOfEmailsSentSoFar:20,
   status:"running"
 },{
-  id:1,
+  id:5,
   numOfEmailsToBeSent:25,
   numOfEmailsSentSoFar:20,
   status:"running"
-}]
+}];
 
 function App() {
+  const [toast,setToast] = useState({isVisible:false, type:'secondary',message:''});
   const [inputFormState,setInputFormState] = useState({
     numberOfEmails:0,
     isError:false,
@@ -46,46 +48,62 @@ function App() {
   const {numberOfEmails, isError, isCreating} = inputFormState;
   const {jobs, isFetching} = jobsState;
 
-  useEffect(()=>{
+  const showToast = (type,message) => {
+    setToast({isVisible:true, type,message});
+    setTimeout(()=>{
+      setToast({isVisible:false, type:'secondary',message:''});
+    },5000);
+  };
+
+  const mergeJobState = (jobData) => { 
+    setJobsState((prevState)=>{
+      const {jobs} = prevState;
+      if(!jobs || jobs.length===0) {
+        return{
+          ...prevState,
+          jobs:[jobData],
+        }
+      }
+      const job = jobs.find((job)=>(job.jobId===jobData.jobId));
+      if(!job) {
+        return {
+          ...prevState,
+          jobs:[...prevState.jobs,jobData],
+        }
+      }
+      const jobsArray = jobs.map((job)=>{
+        if(job.jobId===jobData.jobId) {
+          return jobData;
+        }
+        return job;
+      });
+      return {...prevState,jobs:jobsArray};
+    });
+  };
+
+  /*useEffect(()=>{
     if(isCreating!==false){
       return;
     }
     //make a call to fetch the jobs
-    setJobsState((prevState)=>({...prevState,isFetching:true,jobs:JOB_DATA}));
+    setJobsState((prevState)=>({...prevState,isFetching:true}));
     axios.get('/jobs-repo/jobs').then((data)=>{
-      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data}));
+      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data.data}));
     }).catch((err)=>{
-      //handler error
+      showToast('danger','Unable to connect to jobs api');
     });
-  },[isCreating]);
+  },[isCreating]);*/
 
   useEffect(()=>{
     const socket = io("http://localhost");
-    socket.on("job.update", (jobData) => { 
-      setJobsState((prevState)=>{
-        const {jobs} = prevState;
-        if(!jobs || jobs.length===0) {
-          return{
-            ...prevState,
-            jobs:[jobData],
-          }
-        }
-        const job = jobs.find((job)=>(job.jobId===jobData.jobid));
-        if(!job) {
-          return {
-            ...prevState,
-            jobs:[...prevState.jobs,job],
-          }
-        }
-        const jobsArray = jobs.map((job)=>{
-          if(job.jobId===jobData.jobId) {
-            return jobData;
-          }
-          return job;
-        });
-        return {...prevState,jobs:jobsArray};
-      });
+    setJobsState((prevState)=>({...prevState,isFetching:true}));
+    axios.get('/jobs-repo/jobs').then((data)=>{
+      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data.data}));
+    }).catch((err)=>{
+      showToast('danger','Unable to connect to jobs service');
     });
+    socket.on("job.created", mergeJobState);
+    socket.on("job.updated", mergeJobState);
     return ()=>{
       socket.disconnect();
     }
@@ -103,17 +121,20 @@ function App() {
             setInputFormState((prevState)=>({...prevState,numberOfEmails:value}));
           }}
           onButtonClick={()=>{
-            console.log("hello")
             if(isPositiveInt(numberOfEmails)===false) {
-              console.log("hi")
               setInputFormState((prevState)=>({...prevState,isError:true}));
               return;
             }
             setInputFormState((prevState)=>({...prevState,isError:false, isCreating:true}));
-            // make a call to the backend
-            setTimeout(()=>{
+            // make a call to the backend to the job creation apid
+            axios.post('/jobs-creator/jobs',{numOfEmailsToBeSent: parseInt(numberOfEmails)}).then((data)=>{
+              const {data:{jobId}} = data;
+              setInputFormState((prevState)=>({...prevState,numberOfEmails:0,isCreating:false}));
+              showToast('success',`Email job is being created in the background with id ${jobId}`);
+            }).catch(()=>{
               setInputFormState((prevState)=>({...prevState,isCreating:false}));
-            },3000)
+              showToast('danger','Error occured while processing');
+            })
           }}
         />
         <JobList
@@ -121,6 +142,14 @@ function App() {
           isFetching={isFetching}
         />
       </Container>
+      <ToastComponent 
+        message={toast.message} 
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onCloseClicked={()=>{
+          setToast({isVisible:false, type:'secondary',message:''});
+        }}
+      />
     </>
   );
 }
