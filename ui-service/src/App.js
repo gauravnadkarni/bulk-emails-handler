@@ -1,43 +1,18 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.module.css';
+import classes from './App.module.css';
 import { useEffect, useState } from 'react';
 import { io } from "socket.io-client";
 import axios from 'axios';
 import InputForm from "./components/InputForm";
 import JobList from './components/jobs/JobList';
-import { Container } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import { isPositiveInt } from './utilities/generic';
 import ToastComponent from './components/shared/toast';
-
-const  JOB_DATA =[{
-  jobId:1,
-  numOfEmailsToBeSent:25,
-  numOfEmailsSentSoFar:20,
-  status:"success"
-},{
-  jobId:2,
-  numOfEmailsToBeSent:25,
-  numOfEmailsSentSoFar:20,
-  status:"running"
-},{
-  jobId:3,
-  numOfEmailsToBeSent:25,
-  numOfEmailsSentSoFar:20,
-  status:"failed"
-},{
-  jobId:4,
-  numOfEmailsToBeSent:25,
-  numOfEmailsSentSoFar:20,
-  status:"running"
-},{
-  id:5,
-  numOfEmailsToBeSent:25,
-  numOfEmailsSentSoFar:20,
-  status:"running"
-}];
+import BadgeComponent from './components/shared/badge';
 
 function App() {
   const [toast,setToast] = useState({isVisible:false, type:'secondary',message:''});
+  const [badge,setBadge] = useState({isVisible:true, type:'warning',message:'Connecting.......'});
   const [inputFormState,setInputFormState] = useState({
     numberOfEmails:0,
     isError:false,
@@ -68,7 +43,7 @@ function App() {
       if(!job) {
         return {
           ...prevState,
-          jobs:[...prevState.jobs,jobData],
+          jobs:[jobData,...prevState.jobs],
         }
       }
       const jobsArray = jobs.map((job)=>{
@@ -81,27 +56,20 @@ function App() {
     });
   };
 
-  /*useEffect(()=>{
-    if(isCreating!==false){
-      return;
-    }
-    //make a call to fetch the jobs
-    setJobsState((prevState)=>({...prevState,isFetching:true}));
-    axios.get('/jobs-repo/jobs').then((data)=>{
-      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data.data}));
-    }).catch((err)=>{
-      showToast('danger','Unable to connect to jobs api');
-    });
-  },[isCreating]);*/
-
   useEffect(()=>{
-    const socket = io("http://localhost");
+    const socket = io("/");
     setJobsState((prevState)=>({...prevState,isFetching:true}));
     axios.get('/jobs-repo/jobs').then((data)=>{
       setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data.data}));
     }).catch((err)=>{
       showToast('danger','Unable to connect to jobs service');
     });
+    socket.on('connect',()=>{
+      setBadge((prevState)=>({...prevState,type:"success",message:"Connected to backend!!"}));
+    })
+    socket.on('disconnect',()=>{
+      setBadge((prevState)=>({...prevState,type:"danger",message:"Disconnected from backend!!"}))
+    })
     socket.on("job.created", mergeJobState);
     socket.on("job.updated", mergeJobState);
     return ()=>{
@@ -112,35 +80,48 @@ function App() {
   return (
     <>
       <Container>
-        <InputForm
-          showError={isError}
-          showLoading={isCreating}
-          value={numberOfEmails} 
-          onInputChange={(e)=>{
-            const value = e.target.value;
-            setInputFormState((prevState)=>({...prevState,numberOfEmails:value}));
-          }}
-          onButtonClick={()=>{
-            if(isPositiveInt(numberOfEmails)===false) {
-              setInputFormState((prevState)=>({...prevState,isError:true}));
-              return;
-            }
-            setInputFormState((prevState)=>({...prevState,isError:false, isCreating:true}));
-            // make a call to the backend to the job creation apid
-            axios.post('/jobs-creator/jobs',{numOfEmailsToBeSent: parseInt(numberOfEmails)}).then((data)=>{
-              const {data:{jobId}} = data;
-              setInputFormState((prevState)=>({...prevState,numberOfEmails:0,isCreating:false}));
-              showToast('success',`Email job is being created in the background with id ${jobId}`);
-            }).catch(()=>{
-              setInputFormState((prevState)=>({...prevState,isCreating:false}));
-              showToast('danger','Error occured while processing');
-            })
-          }}
-        />
-        <JobList
-          jobs={jobs}
-          isFetching={isFetching}
-        />
+        <Row>
+          <Col xl={12} lg={12} md={12} sm={12} xs={12} className={classes.columnContainer}>
+              <BadgeComponent type={badge.type} message={badge.message} show={badge.isVisible}/>
+          </Col>
+        </Row>
+        <Row>
+          <Col xl={12} lg={12} md={12} sm={12} xs={12} className={classes.columnContainer}>
+            <InputForm
+              showError={isError}
+              showLoading={isCreating}
+              value={numberOfEmails} 
+              onInputChange={(e)=>{
+                const value = e.target.value;
+                setInputFormState((prevState)=>({...prevState,numberOfEmails:value}));
+              }}
+              onButtonClick={()=>{
+                if(isPositiveInt(numberOfEmails)===false) {
+                  setInputFormState((prevState)=>({...prevState,isError:true}));
+                  return;
+                }
+                setInputFormState((prevState)=>({...prevState,isError:false, isCreating:true}));
+                // make a call to the backend to the job creation apid
+                axios.post('/jobs-creator/jobs',{numOfEmailsToBeSent: parseInt(numberOfEmails)}).then((data)=>{
+                  const {data:{jobId}} = data;
+                  setInputFormState((prevState)=>({...prevState,numberOfEmails:0,isCreating:false}));
+                  showToast('success',`Email job is being created in the background with id ${jobId}`);
+                }).catch(()=>{
+                  setInputFormState((prevState)=>({...prevState,isCreating:false}));
+                  showToast('danger','Error occured while processing');
+                })
+              }}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col xl={12} lg={12} md={12} sm={12} xs={12} className={classes.columnContainer}>
+            <JobList
+              jobs={jobs}
+              isFetching={isFetching}
+            />
+          </Col>
+        </Row>
       </Container>
       <ToastComponent 
         message={toast.message} 

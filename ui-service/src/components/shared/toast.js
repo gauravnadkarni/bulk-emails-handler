@@ -22,7 +22,6 @@ export default function ToastComponent(props) {
             >
                 <Toast.Header
                     closeButton
-                    closeVariant='black'
                 >
                     <strong className="me-auto">Notification</strong>
                 </Toast.Header>

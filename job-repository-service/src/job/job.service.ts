@@ -55,6 +55,7 @@ export class JobService {
           return;
         }
         await this.jobRepository.createQueryBuilder().update(jobEntity).set({
+            status: jobDto.status,
             numOfEmailsSentSoFar: () =>("numOfEmailsSentSoFar + 1"),
         }).where("id=:id",{id: jobEntity.id}).execute();
     });

@@ -32,6 +32,8 @@ services:
     image: node:18.16.0 
     container_name: notification-worker
     working_dir: /app
+    env_file:
+    - ./notification-worker/.env
     ports:
       - "3006:3000" 
     volumes:

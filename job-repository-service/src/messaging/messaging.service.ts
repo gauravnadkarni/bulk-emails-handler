@@ -62,9 +62,11 @@ export class MessagingService {
 
     @RabbitRPC({
         exchange: 'x.fanout',
+        routingKey: "",
         queue: 'q.updateStreamer'
     })
     async readStreamingJobMessage(jobData:Job){
-        //raise an event emmitter event and stream the updates to socket
+        this.eventEmitter.emit("job.updated",jobData);
+        return new Nack();
     }
 }

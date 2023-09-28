@@ -13,6 +13,9 @@ export default class Socket implements OnModuleInit{
     onModuleInit() {
         this.eventEmitter.on('job.created',(event) =>{
             this.server.emit('job.created',event);
-        })
+        });
+        this.eventEmitter.on('job.updated',(event) =>{
+            this.server.emit('job.updated',event);
+        });
     }
 }
