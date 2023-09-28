@@ -1,4 +1,4 @@
-import { Badge } from "react-bootstrap";
+import { Badge, ProgressBar } from "react-bootstrap";
 
 export default function Job(props) {
     const {
@@ -31,6 +31,7 @@ export default function Job(props) {
                         {numOfEmailsSentSoFar}
                     </Badge>
                 </td>
+                <td><ProgressBar variant="info" min={0} max={numOfEmailsToBeSent} now={numOfEmailsSentSoFar}/></td>
                 <td>{statusComponent}</td>
             </tr>)        
 }

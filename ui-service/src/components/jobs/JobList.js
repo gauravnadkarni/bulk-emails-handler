@@ -16,12 +16,13 @@ export default function JobList(props) {
                         <th>Job Id</th>
                         <th>Number of emails to be sent</th>
                         <th>Number of emails sent so far</th>
+                        <th>Progress</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {isFetching && (<tr>
-                        <td colSpan={4}><div className={classes.centerSpinner}><Spinner animation="border" role="status">
+                        <td colSpan={5}><div className={classes.centerSpinner}><Spinner animation="border" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </Spinner></div></td>
                     </tr>)}
@@ -33,8 +34,8 @@ export default function JobList(props) {
                             numOfEmailsSentSoFar={numOfEmailsSentSoFar}
                             status={status}
                         />))}
-                    {(jobs.length===0) && (<tr>
-                        <td colSpan={4}>No jobs found</td>
+                    {(jobs.length===0 && (isFetching===false)) && (<tr>
+                        <td colSpan={5}>No jobs found</td>
                     </tr>)}
                 </tbody>
             </Table>

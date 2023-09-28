@@ -20,11 +20,11 @@ export class JobsTable1695487870000 implements MigrationInterface {
                     },
                     {
                         name: "numOfEmailsToBeSent",
-                        type: "bigint",
+                        type: "int",
                     },
                     {
                         name: "numOfEmailsSentSoFar",
-                        type: "bigint",
+                        type: "int",
                     },
                     {
                         name: "status",

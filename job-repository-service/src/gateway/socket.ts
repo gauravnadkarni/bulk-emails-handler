@@ -3,13 +3,19 @@ import { ConfigService } from "@nestjs/config";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
+import { Job } from "../job/dto/job.dto";
+import { JobService } from "src/job/job.service";
 
 @WebSocketGateway()
 export default class Socket implements OnModuleInit{
     @WebSocketServer()
     server:Server;
 
-    constructor(private readonly eventEmitter: EventEmitter2,private readonly configService:ConfigService) {}
+    constructor(
+        private readonly eventEmitter: EventEmitter2,
+        private readonly configService:ConfigService,
+        private readonly jobService:JobService
+    ) {}
 
     onModuleInit() {
         const emitterJobCreatedEvent = this.configService.get("EMITTER_JOB_CREATED_EVENT");
@@ -21,6 +27,12 @@ export default class Socket implements OnModuleInit{
         });
         this.eventEmitter.on(emitterJobUpdatedEvent,(event) =>{
             this.server.emit(socketJobUpdatedEvent,event);
+        });
+        this.server.on("connection",async (socket)=>{
+            socket.on("jobs.refresh",async ()=>{
+                const jobs:Array<Job> = await this.jobService.findAllJobs();
+                this.server.emit("jobs.refresh",jobs);
+            });
         });
     }
 }

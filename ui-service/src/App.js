@@ -59,19 +59,24 @@ function App() {
   useEffect(()=>{
     const socket = io("/");
     setJobsState((prevState)=>({...prevState,isFetching:true}));
-    axios.get('/jobs-repo/jobs').then((data)=>{
+    /*axios.get('/jobs-repo/jobs').then((data)=>{
       setJobsState((prevState)=>({...prevState,isFetching:false,jobs:data.data}));
     }).catch((err)=>{
       showToast('danger','Unable to connect to jobs service');
-    });
+    });*/
     socket.on('connect',()=>{
       setBadge((prevState)=>({...prevState,type:"success",message:"Connected!!"}));
+      setJobsState((prevState)=>({...prevState,isFetching:true}));
+      socket.emit('jobs.refresh',{});
     })
     socket.on('disconnect',()=>{
       setBadge((prevState)=>({...prevState,type:"danger",message:"Disconnected!!"}))
     })
     socket.on("job.created", mergeJobState);
     socket.on("job.updated", mergeJobState);
+    socket.on("jobs.refresh", (jobsData)=>{
+      setJobsState((prevState)=>({...prevState,isFetching:false,jobs:jobsData}));
+    });
     return ()=>{
       socket.disconnect();
     }
