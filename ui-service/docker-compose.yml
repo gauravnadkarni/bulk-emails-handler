@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  ui-service:
+    image: node:18.16.0 
+    container_name: react-app
+    hostname: ui-service
+    working_dir: /app
+    env_file:
+    - ./.env
+    ports:
+      - "3002:3000" 
+    volumes:
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    command: sh -c "npm install && npm start"

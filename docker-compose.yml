@@ -1,4 +1,41 @@
+version: '3'
+
 include:
-  - docker-compose-backend-services.yml
-  - docker-compose-api-services.yml
-  - docker-compose-frontend-services.yml
+  - ./ui-service/docker-compose.yml
+  - ./job-creation-service/docker-compose.yml
+  - ./notification-worker/docker-compose.yml
+  - ./job-repository-service/docker-compose.yml
+
+services:
+  jobrepodb:
+    image: mysql:latest
+    container_name: jobrepodb
+    environment:
+      MYSQL_ROOT_PASSWORD: Password@1
+      MYSQL_DATABASE: dbjobs
+
+  queue:
+    image: "rabbitmq:3.11"
+    container_name: queue
+    hostname: backend-queue
+    ports:
+      - "5672:5672" # RabbitMQ default port for AMQP
+      - "15672:15672" # RabbitMQ Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=Pass123
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+
+  reverseproxy:
+    image: nginx:latest
+    container_name: reverseproxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - ui-service
+      - job-repository-service
+    restart: on-failure
