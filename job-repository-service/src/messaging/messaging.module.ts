@@ -6,14 +6,14 @@ import { JobModule } from '../job/job.module';
 @Module({
   imports: [
     RabbitMQModule.forRoot(RabbitMQModule, {
-      name: "store_connection",
+      name: process.env.QUEUE_CONNECTION_NAME,
       exchanges: [
         {
-          name: 'x.direct',
+          name: process.env.QUEUE_DIRECT_EXCHANGE_NAME,
           type: 'direct',
         },
       ],
-      uri:  'amqp://jobstore:Pass123@backend-queue:5672',
+      uri: `amqp://${process.env.QUEUE_USERNAME}:${process.env.QUEUE_PASSWORD}@${process.env.QUEUE_SERVICE_NAME}:${process.env.QUEUE_PORT}`,
       connectionInitOptions: { wait: false },
     }),
     JobModule

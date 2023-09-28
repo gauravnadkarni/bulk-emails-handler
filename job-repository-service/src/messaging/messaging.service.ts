@@ -1,5 +1,6 @@
 import { AmqpConnection, Nack, RabbitRPC } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Job } from 'src/job/dto/job.dto';
 import { JobService } from 'src/job/job.service';
@@ -9,18 +10,20 @@ export class MessagingService {
     constructor(
         private readonly amqpConnection: AmqpConnection,
         private readonly jobService:JobService, 
-        private readonly eventEmitter: EventEmitter2
+        private readonly eventEmitter: EventEmitter2,
+        private readonly configService:ConfigService,
     ){}
 
     @RabbitRPC({
-        exchange: 'x.direct',
-        routingKey: 'route.job.create',
-        queue: 'q.jobCreator'
+        exchange: process.env.QUEUE_DIRECT_EXCHANGE_NAME,
+        routingKey: process.env.QUEUE_EXCHANGE_ROUTE_JOB_CREATE,
+        queue: process.env.QUEUE_NAME_JOB_CREATOR
     })
     async readNewJobCreatedMessage(jobData:Job){
+        const jobCreatedEvent = this.configService.get("EMITTER_JOB_CREATED_EVENT");
         try{
             await this.jobService.addNewJob(jobData);
-            await this.eventEmitter.emit("job.created", jobData);
+            await this.eventEmitter.emit(jobCreatedEvent, jobData);
             this.pushMessageForSendingNotifications(jobData);
             return new Nack();  //positivly ack
         } catch(err) {
@@ -29,13 +32,15 @@ export class MessagingService {
     }
 
     async pushMessageForSendingNotifications(job:Job):Promise<void> {
-        await this.amqpConnection.publish<Job>('x.direct','route.email.process',job);
+        const directExchangeName = this.configService.get("QUEUE_DIRECT_EXCHANGE_NAME");
+        const routeEmailProcess = this.configService.get("QUEUE_EXCHANGE_ROUTE_EMAIL_PROCESS");
+        await this.amqpConnection.publish<Job>(directExchangeName,routeEmailProcess,job);
     }
 
     @RabbitRPC({
-        exchange: 'x.direct',
-        routingKey: 'route.email.update',
-        queue: 'q.emailUpdateProcessor'
+        exchange: process.env.QUEUE_DIRECT_EXCHANGE_NAME,
+        routingKey: process.env.QUEUE_EXCHANGE_ROUTE_EMAIL_UPDATE,
+        queue: process.env.QUEUE_NAME_EMAIL_UPDATE_PROCESSOR
     })
     async readJobUpdatedMessage(jobData:Job){
         try{
@@ -57,16 +62,18 @@ export class MessagingService {
     }
 
     async fanOutJobUpdateMessage(job:Job):Promise<void> {
-        await this.amqpConnection.publish<Job>('x.fanout',"",job);
+        const fanoutExchangeName = this.configService.get("QUEUE_FANOUT_EXCHANGE_NAME");
+        await this.amqpConnection.publish<Job>(fanoutExchangeName,"",job);
     }
 
     @RabbitRPC({
-        exchange: 'x.fanout',
+        exchange: process.env.QUEUE_FANOUT_EXCHANGE_NAME,
         routingKey: "",
-        queue: 'q.updateStreamer'
+        queue: process.env.QUEUE_NAME_UPDATE_STREAMER
     })
     async readStreamingJobMessage(jobData:Job){
-        this.eventEmitter.emit("job.updated",jobData);
+        const jobUpdatedEvent = this.configService.get("EMITTER_JOB_UPDATED_EVENT");
+        this.eventEmitter.emit(jobUpdatedEvent,jobData);
         return new Nack();
     }
 }

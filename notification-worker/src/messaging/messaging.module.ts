@@ -2,21 +2,21 @@ import { Module } from '@nestjs/common';
 import { MessagingService } from './messaging.service';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { EmailModule } from 'src/email/email.module';
-
+ 
 @Module({
   imports: [
     RabbitMQModule.forRoot(RabbitMQModule, {
-      name: "worker_connection",
+      name: process.env.QUEUE_CONNECTION_NAME,
       exchanges: [
         {
-          name: 'x.direct',
+          name: process.env.QUEUE_DIRECT_EXCHANGE_NAME,
           type: 'direct',
         },
       ],
-      uri:  'amqp://jobstore:Pass123@backend-queue:5672',
+      uri:  `amqp://${process.env.QUEUE_USERNAME}:${process.env.QUEUE_PASSWORD}@${process.env.QUEUE_SERVICE_NAME}:${process.env.QUEUE_PORT}`,
       connectionInitOptions: { wait: false },
     }),
-    EmailModule,
+    EmailModule, 
   ],
   providers: [MessagingService],
   exports:[MessagingService],

@@ -6,6 +6,8 @@ services:
     container_name: job-repository
     hostname: job-repository-service
     working_dir: /app
+    env_file:
+    - ./job-repository-service/.env
     ports:
       - "3001:3000" 
     volumes:
@@ -20,6 +22,8 @@ services:
     container_name: job-creator
     hostname: job-creation-service
     working_dir: /app
+    env_file:
+    - ./job-creation-service/.env
     ports:
       - "3005:3000" 
     volumes:

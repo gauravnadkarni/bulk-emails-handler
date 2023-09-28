@@ -6,6 +6,8 @@ services:
     container_name: react-app
     hostname: ui-service
     working_dir: /app
+    env_file:
+    - ./ui-service/.env
     ports:
       - "3002:3000" 
     volumes:

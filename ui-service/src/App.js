@@ -65,10 +65,10 @@ function App() {
       showToast('danger','Unable to connect to jobs service');
     });
     socket.on('connect',()=>{
-      setBadge((prevState)=>({...prevState,type:"success",message:"Connected to backend!!"}));
+      setBadge((prevState)=>({...prevState,type:"success",message:"Connected!!"}));
     })
     socket.on('disconnect',()=>{
-      setBadge((prevState)=>({...prevState,type:"danger",message:"Disconnected from backend!!"}))
+      setBadge((prevState)=>({...prevState,type:"danger",message:"Disconnected!!"}))
     })
     socket.on("job.created", mergeJobState);
     socket.on("job.updated", mergeJobState);

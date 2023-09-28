@@ -13,12 +13,12 @@ export class MessagingService {
     ){}
 
     @RabbitRPC({
-        exchange: 'x.direct',
-        routingKey: 'route.email.process',
-        queue: 'q.emailProcessor'
+        exchange: process.env.QUEUE_DIRECT_EXCHANGE_NAME,
+        routingKey: process.env.QUEUE_EXCHANGE_ROUTE_EMAIL_PROCESS,
+        queue: process.env.QUEUE_NAME_EMAIL_PROCESSOR
     })
     async processMessage(message:Message){
-        const toEmail = this.configService.get("TO_EMAIL")
+        const toEmail = this.configService.get("TO_EMAIL");
         try{
             message.status = "running";
             let isFailed = false;
@@ -54,6 +54,8 @@ export class MessagingService {
     }
 
     async pushMessage(message:Message):Promise<void> {
-        await this.amqpConnection.publish<Message>('x.direct','route.email.update',message);
+        const directExchangeName = this.configService.get("QUEUE_DIRECT_EXCHANGE_NAME");
+        const directExchangeRoute = this.configService.get("QUEUE_EXCHANGE_ROUTE_EMAIL_UPDATE")
+        await this.amqpConnection.publish<Message>(directExchangeName,directExchangeRoute,message);
     }
 }

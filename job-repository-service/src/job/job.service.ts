@@ -43,9 +43,9 @@ export class JobService {
   }
 
   async updateJobStatusById(jobDto:JobDto): Promise<JobDto> {
-    let jobEntity:JobEntity = await this.jobRepository.findOneBy({jobId:jobDto.jobId})
-    const updatedJob:UpdateResult = await this.jobRepository.update(jobEntity.id!, {status:jobDto.status, isDone:jobDto.isDone});
-    return await this.jobRepository.findOneBy({jobId:jobDto.jobId})
+    let jobEntity:JobEntity = await this.jobRepository.findOneBy({jobId:jobDto.jobId});
+    await this.jobRepository.update({id:jobEntity.id}, {status:jobDto.status, isDone:jobDto.isDone});
+    return await this.jobRepository.findOneBy({jobId:jobDto.jobId});
   }
 
   async updateEmailSentCount(jobDto:JobDto): Promise<void> {

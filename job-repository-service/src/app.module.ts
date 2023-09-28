@@ -3,9 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JobController } from './job/job.controller';
-import { DatabaseModule } from './database/database.module';
-import databaseConfig from './config/database.config';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import {JobModule} from './job/job.module';
 import {dataSourceOptions} from './config/typeorm.config';
 import { JobService } from './job/job.service';
@@ -23,8 +21,8 @@ import { MessagingModule } from './messaging/messaging.module';
     MessagingModule,
     GatewayModule,
   ],
-  controllers: [AppController, JobController],
-  providers: [AppService, JobService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
