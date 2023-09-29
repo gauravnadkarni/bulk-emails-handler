@@ -386,7 +386,7 @@ This will start all the containers in this project. Please note that some contai
 You can use the following command to check thier status
 > docker ps -a
 
-When all the containers are up and initlaized properly, You can visit http://localhost/ui to see the app in action.
+When all the containers are up and initlaized properly, You can visit http://localhost/ui to see the app in action. Please note that the system will take around a minute to intialize. During this time if you visit the aformentioned url then you will see 502 error.
 
 To stop the containers use the following command,
 > docker compose down
