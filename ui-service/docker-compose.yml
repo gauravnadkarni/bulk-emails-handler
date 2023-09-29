@@ -8,11 +8,6 @@ services:
     working_dir: /app
     env_file:
     - ./.env
-    ports:
-      - "3002:3000" 
     volumes:
       - ./:/app
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
     command: sh -c "npm install && npm start"
