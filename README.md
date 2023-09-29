@@ -28,6 +28,7 @@ Go to the root of the project
 ##### Configure Job Creation Service
 Create a .env file in the 'job-creation-service' directory
 > $ cd ./job-creation-service/
+
 > $ touch .env
 
 Add the following content to this '.env' file.
@@ -51,6 +52,7 @@ Go to parent directory
 ##### Configure Job Repository Service
 Create a .env file in the 'job-repository-service' directory
 > $ cd ./job-repository-service/
+
 > $ touch .env
 
 Add the following content to this '.env' file.
@@ -95,6 +97,7 @@ Go to parent directory
 ##### Configure Notification Worker Service
 Create a .env file in the 'notification-worker' directory
 > $ cd ./notification-worker/
+
 > $ touch .env
 
 Add the following content to this '.env' file.
@@ -126,6 +129,7 @@ Go to parent directory
 ##### Configure UI Service
 Create a .env file in the 'ui' directory
 > $ cd ./ui/
+
 > $ touch .env
 
 Add the following content to this '.env' file.
