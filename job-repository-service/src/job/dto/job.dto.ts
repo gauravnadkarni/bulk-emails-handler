@@ -2,9 +2,10 @@ import {Job as JobEntity} from '../entities/job.entity';
 
 export class Job {
     jobId: string;
-    numOfEmailsToBeSent: bigint;
-    numOfEmailsSentSoFar: bigint;
+    numOfEmailsToBeSent: number;
+    numOfEmailsSentSoFar: number;
     status: string;
+    isStarting?: boolean;
     isDone: boolean;
 
     static fromEntity(jobEntity:JobEntity):Job {

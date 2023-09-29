@@ -44,27 +44,28 @@ export class JobService {
 
   async updateJobStatusById(jobDto:JobDto): Promise<void> {
     await this.jobRepository.manager.transaction(async (transactionalEntityManager) => {
-      let jobEntity:JobEntity = await this.jobRepository.findOneBy({jobId:jobDto.jobId});
+      const jobEntity:JobEntity = await transactionalEntityManager.findOne(JobEntity,{where:{jobId:jobDto.jobId}})
       if(!jobEntity) {
         return;
       }
-      await this.jobRepository.createQueryBuilder().update(jobEntity).set({
-          status: jobDto.status,
-          isDone:jobDto.isDone
-      }).where("id=:id",{id: jobEntity.id}).execute();
+
+      await transactionalEntityManager.update(JobEntity,{id:jobEntity.id},{
+        status: jobDto.status,
+        isDone:jobDto.isDone,
+      });
     });
   }
 
   async updateEmailSentCount(jobDto:JobDto): Promise<void> {
     await this.jobRepository.manager.transaction(async (transactionalEntityManager) => {
-        const jobEntity:JobEntity = await this.jobRepository.findOneBy({jobId:jobDto.jobId});
-        if(!jobEntity) {
-          return;
-        }
-        await this.jobRepository.createQueryBuilder().update(jobEntity).set({
-            status: jobDto.status,
-            numOfEmailsSentSoFar: () =>("numOfEmailsSentSoFar + 1"),
-        }).where("id=:id",{id: jobEntity.id}).execute();
+      const jobEntity:JobEntity = await transactionalEntityManager.findOne(JobEntity,{where:{jobId:jobDto.jobId}})
+      if(!jobEntity) {
+        return;
+      }
+      
+      await transactionalEntityManager.update(JobEntity,{id:jobEntity.id},{
+        numOfEmailsSentSoFar: () =>("numOfEmailsSentSoFar + 1"),
+      });
     });
   }
 }

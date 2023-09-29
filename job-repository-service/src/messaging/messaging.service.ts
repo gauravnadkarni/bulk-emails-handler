@@ -42,16 +42,15 @@ export class MessagingService {
         routingKey: process.env.QUEUE_EXCHANGE_ROUTE_EMAIL_UPDATE,
         queue: process.env.QUEUE_NAME_EMAIL_UPDATE_PROCESSOR
     })
+    
     async readJobUpdatedMessage(jobData:Job){
         try{
             //put updates in the database
-            if(jobData.isDone!==true){
-                //increment count emails sent so far
-                await this.jobService.updateEmailSentCount(jobData);
-            } else {
-                //is extra closing message
-                //update status and isDone without incrementing the emailSentSoFar field
+
+            if(jobData.isDone === true || jobData.isStarting === true){
                 await this.jobService.updateJobStatusById(jobData);
+            } else {
+                await this.jobService.updateEmailSentCount(jobData);
             }
             const job:Job = await this.jobService.findByJobId(jobData.jobId);
             this.fanOutJobUpdateMessage(job);

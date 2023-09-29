@@ -20,7 +20,10 @@ export class MessagingService {
     async processMessage(message:Message){
         const toEmail = this.configService.get("TO_EMAIL");
         try{
+            message.isStarting = true;
             message.status = "running";
+            await this.pushMessage(message);
+            message.isStarting = false;
             let isFailed = false;
             for(let i=1;i<=message.numOfEmailsToBeSent;i++) {
                 try{

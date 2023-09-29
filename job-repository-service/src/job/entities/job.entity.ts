@@ -9,11 +9,11 @@ export class Job {
   @Column({type:'varchar', length: 500 })
   jobId: string;
 
-  @Column('bigint')
-  numOfEmailsToBeSent: bigint;
+  @Column('int')
+  numOfEmailsToBeSent: number;
 
-  @Column('bigint')
-  numOfEmailsSentSoFar: bigint;
+  @Column('int')
+  numOfEmailsSentSoFar: number;
 
   @Column({type:'varchar', length: 10 })
   status: string;
