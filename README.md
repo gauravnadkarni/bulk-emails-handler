@@ -128,7 +128,7 @@ Go to parent directory
 
 ##### Configure UI Service
 Create a .env file in the 'ui' directory
-> $ cd ./ui/
+> $ cd ./ui-service/
 
 > $ touch .env
 
