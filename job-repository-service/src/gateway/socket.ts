@@ -22,6 +22,7 @@ export default class Socket implements OnModuleInit{
         const emitterJobUpdatedEvent = this.configService.get("EMITTER_JOB_UPDATED_EVENT");
         const socketJobCreatedEvent = this.configService.get("SOCKET_JOB_CREATED_EVENT");
         const socketJobUpdatedEvent = this.configService.get("SOCKET_JOB_UPDATED_EVENT");
+        const socketJobsRefreshEvent = this.configService.get("SOCKET_JOBS_REFRESH_EVENT");
         this.eventEmitter.on(emitterJobCreatedEvent,(event) =>{
             this.server.emit(socketJobCreatedEvent,event);
         });
@@ -29,7 +30,7 @@ export default class Socket implements OnModuleInit{
             this.server.emit(socketJobUpdatedEvent,event);
         });
         this.server.on("connection",async (socket)=>{
-            socket.on("jobs.refresh",async ()=>{
+            socket.on(socketJobsRefreshEvent,async ()=>{
                 const jobs:Array<Job> = await this.jobService.findAllJobs();
                 this.server.emit("jobs.refresh",jobs);
             });
