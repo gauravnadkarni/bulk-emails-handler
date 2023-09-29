@@ -17,3 +17,10 @@ services:
     depends_on:
       - jobrepodb
       - queue
+
+  jobrepodb:
+    image: mysql:latest
+    container_name: jobrepodb
+    environment:
+      MYSQL_ROOT_PASSWORD: Password@1
+      MYSQL_DATABASE: dbjobs

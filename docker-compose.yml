@@ -7,13 +7,6 @@ include:
   - ./job-repository-service/docker-compose.yml
 
 services:
-  jobrepodb:
-    image: mysql:latest
-    container_name: jobrepodb
-    environment:
-      MYSQL_ROOT_PASSWORD: Password@1
-      MYSQL_DATABASE: dbjobs
-
   queue:
     image: "rabbitmq:3.11"
     container_name: queue
