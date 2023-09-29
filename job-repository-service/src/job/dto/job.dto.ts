@@ -19,7 +19,7 @@ export class Job {
     }
 
     static toEntity(jobDto:Job):Job {
-        const job:Job = new JobEntity();
+        const job:JobEntity = new JobEntity();
         job.jobId = jobDto.jobId;
         job.numOfEmailsToBeSent = jobDto.numOfEmailsToBeSent;
         job.numOfEmailsSentSoFar = jobDto.numOfEmailsSentSoFar;
