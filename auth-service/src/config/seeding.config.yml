@@ -1,0 +1,11 @@
+users:
+  - 
+    userId: "abc123"
+    email: "alex@beh.com"
+    name: "alex"
+    password: "$2b$10$cjtr6v549ANvusu8xD9CkOyQTdvT1ku9ExoJRELQWTiaEKh1ZPvqy"
+  -
+    userId: "def456"
+    email: "nancy@beh.com"
+    name: "nancy"
+    password: "$2b$10$B9XSZZIJ4TaQtTmbBycg2.KW5E/g4CtXqxYx3jxpSVMJDkBRjtxyi"

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import Utility from './utiltity';
+import Utility from './utility';
 
 @Module({
     providers:[Utility],

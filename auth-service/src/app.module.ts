@@ -8,10 +8,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { dataSourceOptions } from './config/typeorm.config';
 import { UtilityModule } from './utility/utility.module';
+import AppConfig from './config/app.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true,}),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load:[AppConfig]
+    }),
     TypeOrmModule.forRoot(dataSourceOptions),
     AuthModule, 
     UsersModule, UtilityModule
