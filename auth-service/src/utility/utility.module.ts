@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import Utility from './utility';
 
 @Module({
-    providers:[Utility],
-    exports:[Utility],
+    providers:[],
+    exports:[],
 })
 export class UtilityModule {}
