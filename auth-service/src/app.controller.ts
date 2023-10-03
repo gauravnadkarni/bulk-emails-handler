@@ -22,7 +22,9 @@ export class AppController {
   @UseGuards(AccessJwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    const userFromRequest = req.user;
+    const user = this.authService.getUserDetailsById(userFromRequest.userId)
+    return user;
   }
 
   @UseGuards(RefreshJwtAuthGuard)

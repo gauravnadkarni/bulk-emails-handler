@@ -2,6 +2,7 @@ version: '3'
 
 include:
   - ./ui-service/docker-compose.yml
+  - ./auth-service/docker-compose.yml
   - ./job-creation-service/docker-compose.yml
   - ./notification-worker/docker-compose.yml
   - ./job-repository-service/docker-compose.yml

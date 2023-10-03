@@ -14,7 +14,15 @@ export class UsersService {
         const userEntity:UserEntity = await this.userRepository.findOne({where:{email}});
         if(!userEntity) {
             return userEntity;
-          }
-          return UserDto.fromEntity(userEntity);
+        }
+        return UserDto.fromEntity(userEntity);
+      }
+
+    async findByUserId(userId: string): Promise<UserDto> {
+        const userEntity:UserEntity = await this.userRepository.findOne({where:{userId}});
+        if(!userEntity) {
+            return userEntity;
+        }
+        return UserDto.fromEntity(userEntity);
       }
 }

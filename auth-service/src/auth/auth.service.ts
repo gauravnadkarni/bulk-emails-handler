@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import Utility from '../utility/utility';
 import { User } from '../users/dto/user.dto';
@@ -24,6 +24,18 @@ export class AuthService {
         throw new UnauthorizedException("Invalid credentials supplied");
     }
 
+    const { password:hashedPassword, ...plainUserWithoutPassword } = user;
+    // TODO: Generate a JWT and return it here
+    // instead of the user object
+    return plainUserWithoutPassword;
+  }
+
+  async getUserDetailsById(userId: string): Promise<any> {
+    const user:User = await this.usersService.findByUserId(userId);
+    if (!user) {
+      throw new NotFoundException("Unable to find the user");;
+    }
+    
     const { password:hashedPassword, ...plainUserWithoutPassword } = user;
     // TODO: Generate a JWT and return it here
     // instead of the user object
