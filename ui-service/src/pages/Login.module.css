@@ -4,3 +4,6 @@
   align-items: center;
   margin:50px;
 }
+.error{
+  color:red;
+}

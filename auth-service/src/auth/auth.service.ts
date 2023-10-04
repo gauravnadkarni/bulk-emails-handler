@@ -5,6 +5,7 @@ import { User } from '../users/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { jwtConstants } from './constants';
+import { Tokens } from './dto/token.dto';
 
 @Injectable()
 export class AuthService {
@@ -42,27 +43,27 @@ export class AuthService {
     return plainUserWithoutPassword;
   }
 
-  async signin(user: User) {
+  async signin(user: User):Promise<Tokens>{
     const payload = { sub: user.userId, name: user.name };
     const accessTokenPrivateKey = jwtConstants.secretForAccessToken;
     const refreshTokenPrivateKey = jwtConstants.secretForRefreshToken;
-    const accessTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_ACCESS_TOKEN","900s")
-    const refreshTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_REFRESH_TOKEN","60d")
+    const accessTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_ACCESS_TOKEN_IN_SECONDS","900s")
+    const refreshTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_REFRESH_TOKEN_IN_DAYS","60d")
     return {
-      access_token: this.jwtService.sign(payload,{expiresIn: accessTokenExpiresIn, secret: accessTokenPrivateKey}),
-      refresh_token: this.jwtService.sign(payload, {expiresIn: refreshTokenExpiresIn, secret: refreshTokenPrivateKey})
+      access_token: this.jwtService.sign(payload,{expiresIn: `${accessTokenExpiresIn}s`, secret: accessTokenPrivateKey}),
+      refresh_token: this.jwtService.sign(payload, {expiresIn: `${refreshTokenExpiresIn}d`, secret: refreshTokenPrivateKey})
     };
   }
 
-  async refresh(user: User) {
+  async refresh(user: User):Promise<Tokens> {
     const payload = { sub: user.userId, name: user.name };
     const accessTokenPrivateKey = jwtConstants.secretForAccessToken;
     const refreshTokenPrivateKey = jwtConstants.secretForRefreshToken;
-    const accessTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_ACCESS_TOKEN","900s")
-    const refreshTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_REFRESH_TOKEN","60d")
+    const accessTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_ACCESS_TOKEN_IN_SECONDS","900s")
+    const refreshTokenExpiresIn = this.configService.get("APP.EXPIRES_IN_TIME_FOR_REFRESH_TOKEN_IN_DAYS","60d")
     return {
-      access_token: this.jwtService.sign(payload,{expiresIn: accessTokenExpiresIn, secret: accessTokenPrivateKey}),
-      refresh_token: this.jwtService.sign(payload, {expiresIn: refreshTokenExpiresIn, secret: refreshTokenPrivateKey})
+      access_token: this.jwtService.sign(payload,{expiresIn: `${accessTokenExpiresIn}s`, secret: accessTokenPrivateKey}),
+      refresh_token: this.jwtService.sign(payload, {expiresIn: `${refreshTokenExpiresIn}d`, secret: refreshTokenPrivateKey})
     };
   }
 }
