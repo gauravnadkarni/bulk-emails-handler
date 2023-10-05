@@ -3,3 +3,9 @@
   justify-content: center;
   margin:5px;
 }
+
+.signOutControl {
+  top:0;
+  right:0;
+  position: absolute;
+}

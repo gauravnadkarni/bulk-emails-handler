@@ -18,11 +18,11 @@ export class AuthService {
   async validateUser(email: string, plainPassword: string): Promise<any> {
     const user:User = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException("Unauthorized!!");
+      throw new UnauthorizedException("Invalid credentials supplied!!");
     }
     const passCheck = await Utility.checkBcryptHash(plainPassword,user.password);
     if(!passCheck) {
-        throw new UnauthorizedException("Invalid credentials supplied");
+        throw new UnauthorizedException("Invalid credentials supplied!!");
     }
 
     const { password:hashedPassword, ...plainUserWithoutPassword } = user;

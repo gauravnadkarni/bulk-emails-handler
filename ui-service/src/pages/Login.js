@@ -1,11 +1,13 @@
 
-import { Card, Row, Col, Button, Container, InputGroup, Form } from 'react-bootstrap';
+import { Card, Row, Col, Button, Container, InputGroup, Form, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 import classes from './Login.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import classnames from "classnames"
 
 function Login() {
+  const initialErrorState = {email:null,password:null,action:null};
   const initialState = {
     email:"",
     password:"",
@@ -14,6 +16,7 @@ function Login() {
     error:{email:null,password:null,action:null},
   }
   const [loginInfo, setLoginInfo] = useState(initialState);
+  const navigate = useNavigate();
 
   const {
     email,
@@ -24,7 +27,7 @@ function Login() {
   } = loginInfo;
 
   const validateLoginForm = () => {
-    const errorObject = {};
+    const errorObject = {...initialErrorState};
     const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let isError = false;
     if(!email || (emailRegex.test(email)!==true)) {
@@ -36,27 +39,34 @@ function Login() {
       errorObject.password = "Invalid password";
       isError=true;
     }
-    setLoginInfo((prevState)=>({...prevState,error:errorObject,isError,isChecking:false}));
+    setLoginInfo((prevState)=>({...prevState,error:errorObject,isError}));
     return !isError;
   }
 
   const onLoginClicked = async () => {
-    setLoginInfo((prevState)=>({...prevState,isChecking:true}));
     if(validateLoginForm()===false) {
       return;
     }
+    setLoginInfo((prevState)=>({...prevState,isChecking:true}));
     axios.post('/users/auth/signin',{
       email,
       password,
       setInCookie:true,
     }).then((response)=>{
-      console.log(response);
-      //setLoginInfo((prevState)=>({...initialState}));
+      setLoginInfo((prevState)=>({...initialState}));
+      navigate('/ui/dashboard');
     }).catch((err)=> {
-      console.log(err);
+      setLoginInfo((prevState)=>({
+        ...prevState,
+        isChecking:false,
+        error:{...prevState.errorObject,action:err.response.data.message},
+        isError:true,
+      }));
     });
   };
-
+  useEffect(()=>{
+    console.log(loginInfo);
+  })
   return (
     <div className={classes.container}>
       <Card className={classes.panelParent}>
@@ -67,7 +77,7 @@ function Login() {
             <Container fluid>
                 <Row className={classes.headerRow}>
                     <Col lg={12} md={12}>
-                      <InputGroup className={{['mb-1']:!isError}}>
+                      <InputGroup className="mb-1">
                         <InputGroup.Text id="basic-addon1">Email</InputGroup.Text>
                         <Form.Control
                           placeholder="abc@domain.com"
@@ -97,7 +107,10 @@ function Login() {
                     </Col>
                 </Row>
                 <Row className={classes.headerRow}>
-                    <Col lg={{offset:9,span:3}} md={{offset:9,span:3}}>
+                    <Col lg={9} md={9}>
+                      {isError && <div className={classes.error}>{error.action}</div>}
+                    </Col>
+                    <Col lg={3} md={3}>
                       <Button 
                         variant="primary"
                         onClick={onLoginClicked}

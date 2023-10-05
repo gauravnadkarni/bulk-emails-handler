@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import axios from 'axios';
 import InputForm from "../components/InputForm";
 import JobList from '../components/jobs/JobList';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { isPositiveInt } from '../utilities/generic';
 import ToastComponent from '../components/shared/toast';
 import BadgeComponent from '../components/shared/badge';
@@ -19,9 +19,11 @@ function Dashboard() {
     isCreating: false,
   });
   const [jobsState,setJobsState] = useState({jobs:[],isFetching:false});
+  const [logoutState,setLogoutState] = useState({isLoggingOut:false, isLoggedOut:false})
 
   const {numberOfEmails, isError, isCreating} = inputFormState;
   const {jobs, isFetching} = jobsState;
+  const {isLoggingOut, isLoggedOut} = logoutState;
 
   const showToast = (type,message) => {
     setToast({isVisible:true, type,message});
@@ -56,6 +58,12 @@ function Dashboard() {
     });
   };
 
+  const onLogoutClicked = () => {
+    setLogoutState((prevState)=>({...prevState, isLoggingOut:true}));
+    //make a call to backend to delete cookies
+    //redirect to the login view
+  };
+
   useEffect(()=>{
     const socket = io("/");
     setJobsState((prevState)=>({...prevState,isFetching:true}));
@@ -85,6 +93,12 @@ function Dashboard() {
   return (
     <>
       <Container>
+        <Row>
+          <Col xl={{offset:10,span:2}} lg={{offset:10,span:2}} md={{offset:10,span:2}} sm={{offset:10,span:2}} xs={{offset:10,span:2}} className={classes.signOutControl}>
+            {(!isLoggingOut && !isLoggedOut) && (<Button variant="link" onClick={onLogoutClicked}>Logout</Button>)}
+            {(isLoggingOut && !isLoggedOut) && (<Spinner />)}
+          </Col>
+        </Row>
         <Row>
           <Col xl={12} lg={12} md={12} sm={12} xs={12} className={classes.columnContainer}>
               <BadgeComponent type={badge.type} message={badge.message} show={badge.isVisible}/>
